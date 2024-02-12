@@ -2,8 +2,13 @@ const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const Product = require('./models/Product');
+const { result } = require('lodash');
 
 const app = express();
+
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
 
 //setting up the database
 
@@ -24,7 +29,23 @@ mongoose
 
 // setting the view engine
 
-// app.set('view engine', 'ejs');
+app.set('view engine', 'ejs');
+
+app.post('/products', async (req, res) => {
+  try {
+    const product = await new Product(req.body);
+    product.save();
+    res.redirect('all-product');
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get('/product/:id', async (req, res) => {
+  const id = req.params.id;
+  const data = await Product.findById(id);
+  res.render('details', { title: 'Blog Details', blogs: data });
+});
 
 app.get('/products', (req, res) => {
   const product = new Product({
@@ -48,6 +69,16 @@ app.get('/products', (req, res) => {
 app.get('/all-product', async (req, res) => {
   try {
     const data = await Product.find();
+    res.render('index', { title: 'All products', blogs: data });
+    res.end();
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get(`products`, async (req, res) => {
+  try {
+    const data = Product.findById(id);
     res.send(data);
   } catch (error) {
     console.log(error);
@@ -55,10 +86,6 @@ app.get('/all-product', async (req, res) => {
 });
 
 // listen for request
-
-app.use(express.static('public'));
-
-app.use(morgan('dev'));
 
 app.get('/', (req, res) => {
   const blogs = [
