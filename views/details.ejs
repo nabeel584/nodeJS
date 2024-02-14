@@ -22,12 +22,17 @@
                     const trashcan = document.querySelector('a.delete');
 
                     trashcan.addEventListener('click', (e) => {
-                        const endpoint = `/blogs/${trashcan.dataset.doc}`;
+                        console.log('hello')
+                        const endpoint = `/product/${trashcan.dataset.doc}`;
+                        console.log(endpoint)
 
                         fetch(endpoint, {
                             method: 'DELETE',
                         })
-                            .then(response => response.json())
+                            .then(res => console.log(res))
+                            // .then(response => response.json())
+
+                            // .then(data => console.log(data))
                             .then(data => window.location.href = data.redirect)
                             .catch(err => console.log(err));
                     });

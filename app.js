@@ -2,7 +2,6 @@ const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const Product = require('./models/Product');
-const { result } = require('lodash');
 
 const app = express();
 
@@ -34,6 +33,7 @@ app.set('view engine', 'ejs');
 app.post('/products', async (req, res) => {
   try {
     const product = await new Product(req.body);
+    console.log(req.body);
     product.save();
     res.redirect('all-product');
   } catch (error) {
@@ -44,7 +44,18 @@ app.post('/products', async (req, res) => {
 app.get('/product/:id', async (req, res) => {
   const id = req.params.id;
   const data = await Product.findById(id);
-  res.render('details', { title: 'Blog Details', blogs: data });
+  res.render('details', { title: 'Blog Details', blog: data });
+});
+
+app.delete('/product/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const res = await Product.findByIdAndDelete(id);
+    const data = res.json({ redirect: '/all-product' });
+    console.log(data);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.get('/products', (req, res) => {
